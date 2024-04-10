@@ -231,12 +231,19 @@ userRouter.get("/download/:userId", async (req, res) => {
     try {
         const { userId } = req.params;
         const posts = await postModel.find(
-            {},
-            { _id: 0, id: 1, userId: userId, title: 1, body: 1 }
+            { userId: userId },
+            { _id: 0, id: 1, userId: 1, title: 1, body: 1 }
         );
+
         const data = posts.map((post) => {
-            return post;
+            return {
+                id: post.id,
+                userId: post.userId,
+                title: post.title,
+                body: post.body,
+            };
         });
+
         const worksheet = xlsx.utils.json_to_sheet(data);
 
         const workbook = xlsx.utils.book_new();
@@ -251,16 +258,25 @@ userRouter.get("/download/:userId", async (req, res) => {
 
         xlsx.writeFile(workbook, filePath);
 
-        // Send the file as a response
-        res.download(filePath, (err) => {
-            if (err) {
-                throw err;
-            }
+        // Set the response headers to indicate a file download
+        res.setHeader(
+            "Content-Type",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        );
+        res.setHeader(
+            "Content-Disposition",
+            `attachment; filename=user_${userId}_posts.xlsx`
+        );
 
-            // Delete the file after sending
+        // Send the file as a response
+        const fileStream = fs.createReadStream(filePath);
+        fileStream.pipe(res);
+
+        // Delete the file after sending
+        fileStream.on("end", () => {
             fs.unlinkSync(filePath, (unlinkErr) => {
                 if (unlinkErr) {
-                    throw unlinkErr;
+                    console.error(unlinkErr);
                 }
             });
         });

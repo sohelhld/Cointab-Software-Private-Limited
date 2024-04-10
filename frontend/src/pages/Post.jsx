@@ -74,7 +74,7 @@ function UserPosts() {
 
             alert("Excel file uploaded ");
         } catch (error) {
-            console.error("Error fetching posts:", error);
+            console.log(error.message);
         }
     };
 
