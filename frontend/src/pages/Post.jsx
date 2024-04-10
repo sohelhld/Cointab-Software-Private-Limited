@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 
 import "./post.css"; // Import CSS file
+import { useParams } from "react-router-dom";
 import { baseUrl } from "../api";
 
 function UserPosts() {
-    const [userId, setUserId] = useState(1);
+    const { userId } = useParams();
     const [posts, setPosts] = useState([]);
     const [showBulkAdd, setShowBulkAdd] = useState(true);
     const [user, setUser] = useState({});
@@ -25,9 +26,7 @@ function UserPosts() {
         };
         const fetchUser = async () => {
             try {
-                const response = await fetch(
-                    `https://jsonplaceholder.typicode.com/users/${userId}`
-                );
+                const response = await fetch(`${baseUrl}${userId}`);
                 // const response = await fetch(`${baseUrl}bulk-add/${userId}`);
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
@@ -42,39 +41,59 @@ function UserPosts() {
         fetchUserPosts();
     }, [userId]);
 
-    const bulkAddPosts = async () => {
+    const bulkAddPosts = async (userId) => {
         try {
-            const response = await fetch(`${baseUrl}bulk-add/${userId}`);
+            const response = await fetch(`${baseUrl}bulk-add/${userId}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                // body: JSON.stringify(postData),
+            });
+
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
+
             const data = await response.json();
-            setPosts(data);
+            setUser(data.user);
+            alert("bulk data uploaded");
         } catch (error) {
             console.error("Error fetching posts:", error);
         }
     };
 
-    const downloadExcel = () => {};
+    const downloadExcel = async () => {
+        try {
+            const response = await fetch(`${baseUrl}download/${userId}`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            const data = await response.json();
+            console.log(data);
+
+            alert("Excel file uploaded ");
+        } catch (error) {
+            console.error("Error fetching posts:", error);
+        }
+    };
 
     return (
         <div className="container">
             <h2 className="user-name">Title: {user?.name}</h2>
-            <h2 className="user-name">Company: {user?.company.name}</h2>
-            <button
-                className="action-button"
-                onClick={bulkAddPosts}
-                style={{ display: showBulkAdd ? "block" : "none" }}
-            >
-                Bulk Add
-            </button>
-            <button
-                className="action-button"
-                onClick={downloadExcel}
-                style={{ display: showBulkAdd ? "none" : "block" }}
-            >
-                Download In Excel
-            </button>
+            <h2 className="user-name">Company: {user?.company?.name}</h2>
+            {!user?.uploaded ? (
+                <button
+                    className="action-button"
+                    onClick={() => bulkAddPosts(user.id)}
+                >
+                    Bulk Add
+                </button>
+            ) : (
+                <button className="action-button" onClick={downloadExcel}>
+                    Download In Excel
+                </button>
+            )}
 
             <h3 className="posts-heading">Posts:</h3>
             <ul className="posts-list">
