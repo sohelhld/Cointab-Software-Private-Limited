@@ -64,18 +64,7 @@ function UserPosts() {
     };
 
     const downloadExcel = async () => {
-        try {
-            const response = await fetch(`${baseUrl}download/${userId}`);
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-            const data = await response.json();
-            console.log(data);
-
-            alert("Excel file uploaded ");
-        } catch (error) {
-            console.log(error.message);
-        }
+        window.open(`${baseUrl}download/${userId}`);
     };
 
     return (
