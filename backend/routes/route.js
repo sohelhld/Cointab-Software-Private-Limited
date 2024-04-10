@@ -42,6 +42,18 @@ userRouter.post("/add", async (req, res) => {
     }
 });
 
+userRouter.get("/:id", async (req, res) => {
+    try {
+        const user = await User.findOne({ id: req.params.id });
+        if (!user) {
+            return res.status(401).send({ message: "user not present" });
+        }
+        res.status(200).send(user);
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+});
+
 userRouter.get("/posts/:userId", async (req, res) => {
     try {
         const { userId } = req.params;
