@@ -6,13 +6,6 @@ function Home() {
     const [users, setUsers] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
-
-    const [count, setCount] = useState(0);
-
-    // useEffect(() => {
-
-    // }, [count]);
-
     const fetchData = async () => {
         try {
             const response = await fetch(`${baseUrl}all`);
@@ -32,6 +25,7 @@ function Home() {
         <div className="home">
             <h1>User Information</h1>
             <button
+                className="custom-button"
                 onClick={() => {
                     fetchData();
                 }}
@@ -41,7 +35,7 @@ function Home() {
             </button>
             <div className="user-list">
                 {users.map((user) => (
-                    <UserCard key={user.id} user={user} />
+                    <UserCard key={user.id} user={user} setUsers={setUsers} />
                 ))}
             </div>
         </div>

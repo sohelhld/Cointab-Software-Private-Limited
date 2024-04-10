@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-import "./post.css"; // Import CSS file
+import "./post.css"; 
 import { useParams } from "react-router-dom";
 import { baseUrl } from "../api";
 
@@ -14,7 +14,6 @@ function UserPosts() {
         const fetchUserPosts = async () => {
             try {
                 const response = await fetch(`${baseUrl}posts/${userId}`);
-                // const response = await fetch(`${baseUrl}bulk-add/${userId}`);
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
@@ -48,7 +47,6 @@ function UserPosts() {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                // body: JSON.stringify(postData),
             });
 
             if (!response.ok) {
@@ -73,13 +71,13 @@ function UserPosts() {
             <h2 className="user-name">Company: {user?.company?.name}</h2>
             {!user?.uploaded ? (
                 <button
-                    className="action-button"
+                    className="custom-button"
                     onClick={() => bulkAddPosts(user.id)}
                 >
                     Bulk Add
                 </button>
             ) : (
-                <button className="action-button" onClick={downloadExcel}>
+                <button className="custom-button" onClick={downloadExcel}>
                     Download In Excel
                 </button>
             )}

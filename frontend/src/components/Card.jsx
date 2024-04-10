@@ -4,11 +4,11 @@ import "./Card.css";
 import { useNavigate } from "react-router-dom";
 import { baseUrl } from "../api";
 
-const UserCard = ({ user }) => {
+const UserCard = ({ user, setUsers }) => {
     const navigate = useNavigate();
 
     function gotoPost() {
-        navigate(`/post/${user.id}`);
+        navigate(`/post/${user?.id}`);
     }
 
     const addUser = async () => {
@@ -26,7 +26,14 @@ const UserCard = ({ user }) => {
             }
 
             const data = await response.json();
-            console.log(data);
+            setUsers((prev) => {
+                const updatedData = { ...data.data, added: true };
+                const alluers = prev.map((item) => {
+                    return item.id === data.data.id ? updatedData : item;
+                });
+                return alluers;
+            });
+            alert("User added to database");
         } catch (error) {
             console.error("Error adding user:", error);
         }
@@ -35,30 +42,38 @@ const UserCard = ({ user }) => {
     return (
         <div className="card">
             <div className="card-header">
-                <h2>{user.name}</h2>
+                <h2>{user?.name}</h2>
             </div>
             <div className="card-body">
                 <p>
-                    <strong>Email:</strong> {user.email}
+                    <strong>Email:</strong> {user?.email}
                 </p>
                 <p>
-                    <strong>Phone:</strong> {user.phone}
+                    <strong>Phone:</strong> {user?.phone}
                 </p>
                 <p>
-                    <strong>Website:</strong> {user.website}
+                    <strong>Website:</strong> {user?.website}
                 </p>
                 <p>
-                    <strong>City:</strong> {user.address.city}
+                    <strong>City:</strong> {user?.address?.city}
                 </p>
                 <p>
-                    <strong>Company:</strong> {user.company.name}
+                    <strong>Company:</strong> {user?.company?.name}
                 </p>
+                {!user?.added ? (
+                    <button className="custom-button" onClick={addUser}>
+                        Add
+                    </button>
+                ) : (
+                    <button
+                        className="custom-button"
+                        onClick={() => gotoPost(user?.id)}
+                    >
+                        Open
+                    </button>
+                )}
             </div>
-            {!user.added ? (
-                <button onClick={addUser}>Add</button>
-            ) : (
-                <button onClick={() => gotoPost(user.id)}>Open</button>
-            )}
+           
         </div>
     );
 };
